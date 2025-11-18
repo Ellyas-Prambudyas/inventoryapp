@@ -1,43 +1,75 @@
 import 'package:flutter/material.dart';
 
-import '../routes/app_routes.dart';
-import '../widgets/primary_button.dart';
-
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dashboard'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Selamat datang di Inventory App',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+      backgroundColor: const Color(0xFFF8E48C),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      _iconButton(Icons.person),
+                      const SizedBox(width: 12),
+                      _iconButton(Icons.notifications),
+                    ],
                   ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Kelola stok barang dengan mudah dan rapi.',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 24),
-            PrimaryButton(
-              label: 'Lihat Daftar Barang',
-              onPressed: () {
-                Navigator.pushNamed(context, AppRoutes.inventoryList);
-              },
-            ),
-          ],
+                  _iconButton(Icons.add),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.search, color: Colors.black54),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: 'Cari',
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Align(
+                alignment: Alignment.centerRight,
+                child: _iconButton(Icons.settings),
+              ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _iconButton(IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF7C78A),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Icon(icon, size: 24, color: Colors.white),
     );
   }
 }
