@@ -2,7 +2,6 @@
 
 **Inventory App** adalah aplikasi Flutter yang dirancang untuk memberikan pengalaman pengelolaan stok yang lebih modern, cepat, dan akurat. Aplikasi ini membantu pengguna dalam **mencatat, memantau, dan mengelola persediaan barang** secara terstruktur sehingga proses operasional menjadi lebih efisien.
 
-Dengan antarmuka yang bersih dan mudah dipahami, aplikasi ini memungkinkan siapa pun—baik individu maupun UMKM—untuk mengontrol data persediaan dengan tepat waktu dan bebas kesalahan.
 
 ---
 
@@ -12,7 +11,6 @@ Dengan antarmuka yang bersih dan mudah dipahami, aplikasi ini memungkinkan siapa
 
 * Menambahkan item baru dengan detail lengkap.
 * Mengubah informasi barang seperti nama, kategori, dan kuantitas.
-* Menghapus item dari daftar persediaan.
 
 ### **2. Pelacakan Stok**
 
