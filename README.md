@@ -44,6 +44,7 @@ flutter run
 
 3. Pilih perangkat yang ingin digunakan (Android, iOS, atau Chrome untuk web).
 
+
 ---
 
 ## **Cara Instalasi & Deploy**
@@ -67,5 +68,8 @@ flutter build web
 ```
 
 Hasil build berada di folder `build/web/` dan bisa di-upload ke hosting.
+
+Tampilan awal : 
+ ![WhatsApp Image 2025-11-20 at 17 01 04_29446824](https://github.com/user-attachments/assets/fa686534-80a4-4a6b-b806-238e9410b737)
 
 
