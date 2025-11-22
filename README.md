@@ -1,6 +1,6 @@
 # **Inventory App**
 
-**Inventory App** adalah aplikasi Flutter yang dirancang untuk memberikan pengalaman pengelolaan stok yang lebih modern, cepat, dan akurat. Aplikasi ini membantu pengguna dalam **mencatat, memantau, dan mengelola persediaan barang** secara terstruktur sehingga proses operasional menjadi lebih efisien.
+**Inventory App** adalah aplikasi Flutter yang dirancang untuk memberikan pengalaman pengelolaan stok yang lebih modern, cepat, dan akurat. Aplikasi ini membantu pengguna dalam **mencatat, memantau, dan mengelola persediaan barang melalui fitur scan barcode** secara terstruktur sehingga proses operasional menjadi lebih efisien untuk konter service hp
 
 
 ---
@@ -10,12 +10,12 @@
 ### **1. Manajemen Barang**
 
 * Menambahkan item baru dengan detail lengkap.
-* Mengubah informasi barang seperti nama, kategori, dan kuantitas.
+* Mengubah informasi barang seperti nama, merk, harga, total , supplier, gambar barang , download kode QR .dll
 
 ### **2. Pelacakan Stok**
 
 * Menampilkan jumlah stok terbaru secara real-time.
-* Memberikan informasi perubahan stok secara cepat.
+* Memberikan informasi detail produk secara akurat, cukup meng scan barcode.
 
 ### **3. Antarmuka Sederhana dan Responsif**
 
@@ -27,9 +27,8 @@
 ## **Teknologi yang Digunakan**
 
 * **Flutter** (Dart)
-* **Provider / GetX** (opsional, sesuai implementasi Anda)
-* **Local Database** seperti SQLite atau Hive (jika digunakan)
-* **Cloud Backend** (opsional)
+* **Local Database** Hive 
+* **Cloud Backend** Supabase
 
 ---
 
@@ -68,13 +67,5 @@ flutter build web
 ```
 
 Hasil build berada di folder `build/web/` dan bisa di-upload ke hosting.
-
----
-
-## **Kontribusi**
-
-Kontribusi dalam bentuk fitur baru, perbaikan bug, dan peningkatan performa sangat diterima. Lakukan fork dan pull request ke repository.
-
----
 
 
