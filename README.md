@@ -14,7 +14,7 @@ Link Figma : https://www.figma.com/design/iLJ0kZ6V8vcQtAqlSBoOAv/Inventory-App?n
 
 ---
 
-Worksheet : 
+Worksheet : ada di folder worksheet
 
 ---
 
@@ -22,7 +22,7 @@ Low Fidelity Prototype :
 
 ---
 
-Tabel Tugas (Backlog) :
+Tabel Tugas (Backlog) : ada di folder pembagian tugas
 
 ---
 
