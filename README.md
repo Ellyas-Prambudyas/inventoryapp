@@ -19,8 +19,12 @@ Worksheet : ada di folder worksheet
 ---
 
 Low Fidelity Prototype :
-- Gambar
-![Img 1](High Fidelity & Low Fidelity/Low Fidelity 1.png)
+- Low Fidelity 1
+![[Img 1](High Fidelity & Low Fidelity/Low Fidelity 1.png)](https://github.com/Ellyas-Prambudyas/inventoryapp/blob/main/High%20Fidelity%20%26%20Low%20Fidelity/Low%20Fidelity%201.png)
+- Low Fidelity 2
+![[Img 2](High Fidelity & Low Fidelity/Low Fidelity 2.png)](https://github.com/Ellyas-Prambudyas/inventoryapp/blob/main/High%20Fidelity%20%26%20Low%20Fidelity/Low%20Fidelity%202.png)
+- Low Fidelity 3
+![[Img 3](High Fidelity & Low Fidelity/Low Fidelity 3.png)](https://github.com/Ellyas-Prambudyas/inventoryapp/blob/main/High%20Fidelity%20%26%20Low%20Fidelity/Low%20Fidelity%203.png)
 ---
 
 Tabel Tugas (Backlog) : ada di folder pembagian tugas
