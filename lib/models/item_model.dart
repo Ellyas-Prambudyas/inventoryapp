@@ -3,6 +3,8 @@ class ItemModel {
   final String name;
   final String category;
   final int quantity;
+
+  // WAJIB DITAMBAHKAN
   final String? imageUrl;
 
   ItemModel({
