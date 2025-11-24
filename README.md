@@ -19,7 +19,8 @@ Worksheet : ada di folder worksheet
 ---
 
 Low Fidelity Prototype :
-
+- Gambar
+![Img 1](High Fidelity & Low Fidelity/Low Fidelity 1.png)
 ---
 
 Tabel Tugas (Backlog) : ada di folder pembagian tugas
