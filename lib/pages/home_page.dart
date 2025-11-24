@@ -1051,4 +1051,3 @@ class _CenterQrButton extends StatelessWidget {
     );
   }
 }
-asfasgf
