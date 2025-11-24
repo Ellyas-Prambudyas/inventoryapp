@@ -4,8 +4,8 @@
 
 ---
 
-Kelas C - 202210370311491 - Ellyas Prambudyas - Ellyas-Prambudyas 2022-491
-Kelas C - 202210370311465 - Januar Muiz Triananda - januarmuiz-2022-465
+Kelas C - 202210370311491 - Ellyas Prambudyas - Ellyas-Prambudyas
+Kelas C - 202210370311465 - Januar Muiz Triananda - Januar Muiz
 Kelas C - 202210370311509 - Adam Bahari Wiyono - AdamBahari
 
 ---
