@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-ss
+
 import '../models/item_model.dart';
 
 class ServiceService {
