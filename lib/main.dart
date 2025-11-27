@@ -5,11 +5,12 @@ import 'app.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Inisialisasi Supabase (URL & anonKey harus benar)
   await Supabase.initialize(
-    url: '', // masukan api key dari database supabase
+    url: '',
     anonKey: '',
   );
 
   runApp(const InventoryApp());
 }
-p
