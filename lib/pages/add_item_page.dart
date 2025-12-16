@@ -889,7 +889,7 @@ class _ModernTextField extends StatelessWidget {
             color: kTextDark,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 5),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
@@ -936,7 +936,7 @@ class _ConditionChip extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
         decoration: BoxDecoration(
           color: selected ? kPrimary : kCardBg,
           borderRadius: BorderRadius.circular(16),
@@ -947,7 +947,7 @@ class _ConditionChip extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 14,
             fontWeight: FontWeight.w700,
             color: selected ? Colors.white : kPrimary,
           ),
