@@ -8,7 +8,6 @@ import '../pages/service_item_page.dart';
 import '../pages/scan_qr_page.dart';
 
 class AppRoutes {
-  // ===================== NAMA ROUTE =====================
   static const String login = '/login';
   static const String home = '/home';
 
@@ -18,7 +17,6 @@ class AppRoutes {
 
   static const String scanQr = '/scan-qr';
 
-  // ===================== GENERATE ROUTE =====================
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case login:
