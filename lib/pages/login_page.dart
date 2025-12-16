@@ -337,11 +337,11 @@ class _RoundedOrangeTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       obscureText: isPassword,
-      style: const TextStyle(fontSize: 14),
+      style: const TextStyle(fontSize: 15),
       decoration: InputDecoration(
         isDense: true,
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
         filled: true,
         fillColor: orange,
         hintText: hintText,
@@ -354,7 +354,7 @@ class _RoundedOrangeTextField extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           borderSide: const BorderSide(
             color: Color(0xFF007BFF), // garis biru saat fokus
-            width: 3,
+            width: 4,
           ),
         ),
       ),
