@@ -34,7 +34,7 @@ class _InventoryListPageState extends State<InventoryListPage> {
         builder: (context, items, _) {
           if (items.isEmpty) {
             return const Center(
-              child: Text('Belum ada data barang.'),
+              child: Text('Data barang kosong.'),
             );
           }
           return ListView.builder(
