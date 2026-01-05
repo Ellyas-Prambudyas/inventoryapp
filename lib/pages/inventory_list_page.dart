@@ -13,7 +13,8 @@ class InventoryListPage extends StatefulWidget {
 }
 
 class _InventoryListPageState extends State<InventoryListPage> {
-  final _service = InventoryService.instance;
+  final _service = InventoryService();
+
 
   Future<void> _goToAddItem() async {
     final result = await Navigator.pushNamed(context, AppRoutes.addItem);
