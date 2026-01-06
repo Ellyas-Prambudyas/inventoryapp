@@ -15,34 +15,34 @@ import '../models/item_model.dart';
 // ===================== SUPABASE CLIENT =====================
 final supabase = Supabase.instance.client;
 
-// ===================== TEMA WARNA (DISESUAIKAN HOME) =====================
+// ===================== TEMA WARNA (DISAMAKAN DENGAN HOME & ADD ITEM) =====================
 
-const Color kPrimary = Color(0xFFFF7A00); // oranye utama (sama kayak home)
-const Color kBackground = Color(0xFFF5F5F5); // abu-abu muda background
-const Color kCardBg = Colors.white; // kartu putih
-const Color kGreyBorder = Color(0xFFE3E3E3);
-const Color kTextDark = Color(0xFF2E2E2E);
+const Color kPrimary = Color(0xFFFF7A00); // Oranye utama (sama seperti Home)
+const Color kBackground = Color(0xFFF5F5F5); // Abu lembut background
+const Color kCardBg = Colors.white; // Kartu putih
+const Color kGreyBorder = Color(0xFFE3E3E3); // Border tipis
+const Color kTextDark = Color(0xFF2E2E2E); // Teks utama
 
-class AddItemPage extends StatefulWidget {
-  const AddItemPage({super.key});
+class AddServicePage extends StatefulWidget {
+  const AddServicePage({super.key});
 
   @override
-  State<AddItemPage> createState() => _AddItemPageState();
+  State<AddServicePage> createState() => _AddServicePageState();
 }
 
-class _AddItemPageState extends State<AddItemPage> {
+class _AddServicePageState extends State<AddServicePage> {
   final _formKey = GlobalKey<FormState>();
 
   DateTime? _selectedDate;
   String? _selectedCategory;
-  String _condition = 'Baru';
+  String _status = 'Dalam Proses';
 
-  final _nameCtrl = TextEditingController();
-  final _skuCtrl = TextEditingController();
-  final _merkCtrl = TextEditingController();
-  final _hargaCtrl = TextEditingController();
-  final _totalCtrl = TextEditingController();
-  final _supplierCtrl = TextEditingController();
+  final _nameCtrl = TextEditingController(); // Nama barang
+  final _skuCtrl = TextEditingController(); // No. Seri / IMEI
+  final _merkCtrl = TextEditingController(); // Merk
+  final _hargaCtrl = TextEditingController(); // Perkiraan biaya
+  final _totalCtrl = TextEditingController(); // Jumlah unit
+  final _customerCtrl = TextEditingController(); // Nama customer / pemilik
 
   Uint8List? _imageBytes;
   String? _imageName;
@@ -50,10 +50,10 @@ class _AddItemPageState extends State<AddItemPage> {
   bool _saving = false;
 
   final List<String> _categories = [
-    'Handphone',
-    'Laptop',
-    'Aksesoris',
-    'Elektronik Lainnya',
+    'Service Handphone',
+    'Service Laptop',
+    'Service Aksesoris',
+    'Service Elektronik Lainnya',
   ];
 
   final ImagePicker _picker = ImagePicker();
@@ -66,7 +66,7 @@ class _AddItemPageState extends State<AddItemPage> {
     _merkCtrl.dispose();
     _hargaCtrl.dispose();
     _totalCtrl.dispose();
-    _supplierCtrl.dispose();
+    _customerCtrl.dispose();
     super.dispose();
   }
 
@@ -177,7 +177,7 @@ class _AddItemPageState extends State<AddItemPage> {
 
       _showSnack(
         title: 'Gambar dipilih',
-        message: 'Berhasil ambil foto barang.',
+        message: 'Berhasil ambil foto barang service.',
         success: true,
       );
     } catch (e) {
@@ -191,16 +191,16 @@ class _AddItemPageState extends State<AddItemPage> {
 
   String _buildQrData() {
     return '''
-Inventory App - Barang Masuk
+Inventory App - Service Masuk
 Tanggal: ${_selectedDate != null ? _selectedDate!.toIso8601String().split('T').first : '-'}
-Kategori: ${_selectedCategory ?? '-'}
-Nama: ${_nameCtrl.text}
-SKU: ${_skuCtrl.text}
+Jenis Service: ${_selectedCategory ?? '-'}
+Nama Barang: ${_nameCtrl.text}
+No. Seri/IMEI: ${_skuCtrl.text}
 Merk: ${_merkCtrl.text}
-Harga: ${_hargaCtrl.text}
-Total: ${_totalCtrl.text}
-Supplier: ${_supplierCtrl.text}
-Kondisi: $_condition
+Perkiraan Biaya: ${_hargaCtrl.text}
+Jumlah Unit: ${_totalCtrl.text}
+Customer: ${_customerCtrl.text}
+Status: $_status
 Gambar: ${_imageName ?? '-'}
 ''';
   }
@@ -237,7 +237,7 @@ Gambar: ${_imageName ?? '-'}
       final result = await ImageGallerySaverPlus.saveImage(
         pngBytes,
         quality: 100,
-        name: 'qr_barang_${DateTime.now().millisecondsSinceEpoch}',
+        name: 'qr_service_${DateTime.now().millisecondsSinceEpoch}',
       );
 
       final isSuccess =
@@ -246,7 +246,7 @@ Gambar: ${_imageName ?? '-'}
       if (isSuccess) {
         _showSnack(
           title: 'Berhasil',
-          message: 'QR berhasil disimpan ke galeri.',
+          message: 'QR service berhasil disimpan ke galeri.',
           success: true,
         );
       } else {
@@ -269,7 +269,7 @@ Gambar: ${_imageName ?? '-'}
     if (_selectedCategory == null || _nameCtrl.text.trim().isEmpty) {
       _showSnack(
         title: 'Data belum lengkap',
-        message: 'Isi Nama Barang dan pilih Kategori dulu ya',
+        message: 'Isi Nama Barang dan pilih Jenis Service dulu ya',
         success: false,
       );
       return;
@@ -285,7 +285,7 @@ Gambar: ${_imageName ?? '-'}
             borderRadius: BorderRadius.circular(18),
           ),
           title: const Text(
-            'QR Barang',
+            'QR Service',
             style: TextStyle(fontWeight: FontWeight.w700),
           ),
           content: Column(
@@ -305,7 +305,7 @@ Gambar: ${_imageName ?? '-'}
               ),
               const SizedBox(height: 12),
               const Text(
-                'Silakan screenshot atau download QR ini untuk ditempel di barang / rak.',
+                'Silakan screenshot atau download QR ini untuk ditempel di barang / nota service.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 12),
               ),
@@ -326,14 +326,17 @@ Gambar: ${_imageName ?? '-'}
     );
   }
 
+  // ===================== SUPABASE: UPLOAD IMAGE =====================
+
   Future<String?> _uploadImageToSupabase(String itemId) async {
     if (_imageBytes == null) return null;
 
     final sanitizedName =
         (_imageName ?? 'image').replaceAll(RegExp(r'[^a-zA-Z0-9._-]'), '_');
-    final filePath = 'items/$itemId-$sanitizedName';
+    final filePath = 'services/$itemId-$sanitizedName';
 
-    await supabase.storage.from('item-images').uploadBinary(
+    // bucket: service-images
+    await supabase.storage.from('service-images').uploadBinary(
           filePath,
           _imageBytes!,
           fileOptions: const FileOptions(
@@ -344,9 +347,11 @@ Gambar: ${_imageName ?? '-'}
         );
 
     final publicUrl =
-        supabase.storage.from('item-images').getPublicUrl(filePath);
+        supabase.storage.from('service-images').getPublicUrl(filePath);
     return publicUrl;
   }
+
+  // ===================== SUPABASE: SIMPAN DATA =====================
 
   void _onSubmit() async {
     if (!(_formKey.currentState?.validate() ?? false)) {
@@ -361,8 +366,8 @@ Gambar: ${_imageName ?? '-'}
     final qty = int.tryParse(_totalCtrl.text.trim());
     if (qty == null || qty <= 0) {
       _showSnack(
-        title: 'Total tidak valid',
-        message: 'Total harus angka lebih dari 0',
+        title: 'Jumlah tidak valid',
+        message: 'Jumlah unit harus angka lebih dari 0',
         success: false,
       );
       return;
@@ -371,7 +376,7 @@ Gambar: ${_imageName ?? '-'}
     if (_selectedDate == null || _selectedCategory == null) {
       _showSnack(
         title: 'Data belum lengkap',
-        message: 'Tanggal dan kategori wajib diisi',
+        message: 'Tanggal dan jenis service wajib diisi',
         success: false,
       );
       return;
@@ -393,27 +398,27 @@ Gambar: ${_imageName ?? '-'}
         'merk': _merkCtrl.text.trim(),
         'harga': _hargaCtrl.text.trim(),
         'total': qty,
-        'supplier': _supplierCtrl.text.trim(),
+        'customer': _customerCtrl.text.trim(),
         'category': _selectedCategory,
-        'condition': _condition,
+        'status': _status,
         'date': _selectedDate!.toIso8601String(),
         'image_name': _imageName,
         'image_url': imageUrl,
         'created_at': DateTime.now().toIso8601String(),
       };
 
-      await supabase.from('items').insert(data);
+      await supabase.from('services').insert(data);
 
       final item = ItemModel(
         id: id,
         name: _nameCtrl.text.trim(),
-        category: '${_selectedCategory ?? ''} ($_condition)',
+        category: 'Service - ${_selectedCategory ?? ''} ($_status)',
         quantity: qty,
       );
 
       _showSnack(
-        title: 'Barang tersimpan',
-        message: 'Data berhasil disimpan ke Supabase',
+        title: 'Service tersimpan',
+        message: 'Data service berhasil disimpan ke Supabase',
         success: true,
       );
 
@@ -458,7 +463,7 @@ Gambar: ${_imageName ?? '-'}
       backgroundColor: kBackground,
       appBar: AppBar(
         title: const Text(
-          'Barang Masuk',
+          'Service Masuk',
           style: TextStyle(
             fontWeight: FontWeight.w700,
           ),
@@ -540,12 +545,12 @@ Gambar: ${_imageName ?? '-'}
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // BARIS ATAS: TANGGAL + KATEGORI
+              // BARIS ATAS: TANGGAL + JENIS SERVICE
               Row(
                 children: [
                   Expanded(
                     child: _FieldLabelWithBox(
-                      label: 'Tanggal',
+                      label: 'Tanggal Masuk',
                       child: InkWell(
                         onTap: _pickDate,
                         borderRadius: BorderRadius.circular(18),
@@ -593,7 +598,7 @@ Gambar: ${_imageName ?? '-'}
                   const SizedBox(width: 12),
                   Expanded(
                     child: _FieldLabelWithBox(
-                      label: 'Kategori',
+                      label: 'Jenis Service',
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
@@ -614,7 +619,7 @@ Gambar: ${_imageName ?? '-'}
                             ),
                             dropdownColor: Colors.white,
                             hint: const Text(
-                              'Pilih kategori',
+                              'Pilih jenis service',
                               style: TextStyle(
                                 fontSize: 13,
                                 color: kTextDark,
@@ -650,85 +655,11 @@ Gambar: ${_imageName ?? '-'}
                 ],
               ),
 
-              const SizedBox(height: 20),
-
-              // FIELD TEKS
-              _ModernTextField(
-                label: 'Nama Barang',
-                controller: _nameCtrl,
-                validator: (v) =>
-                    v == null || v.trim().isEmpty ? 'Wajib diisi' : null,
-              ),
-              const SizedBox(height: 10),
-              _ModernTextField(
-                label: 'SKU',
-                controller: _skuCtrl,
-              ),
-              const SizedBox(height: 10),
-              _ModernTextField(
-                label: 'Merk',
-                controller: _merkCtrl,
-              ),
-              const SizedBox(height: 10),
-              _ModernTextField(
-                label: 'Harga',
-                controller: _hargaCtrl,
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 10),
-              _ModernTextField(
-                label: 'Total',
-                controller: _totalCtrl,
-                keyboardType: TextInputType.number,
-                validator: (v) =>
-                    v == null || v.trim().isEmpty ? 'Wajib diisi' : null,
-              ),
-              const SizedBox(height: 10),
-              _ModernTextField(
-                label: 'Supplier',
-                controller: _supplierCtrl,
-              ),
-              const SizedBox(height: 18),
-
-              // KONDISI
-              const Text(
-                'Kondisi',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: kTextDark,
-                  fontSize: 12,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  _ConditionChip(
-                    label: 'Baru',
-                    selected: _condition == 'Baru',
-                    onTap: () {
-                      setState(() {
-                        _condition = 'Baru';
-                      });
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  _ConditionChip(
-                    label: 'Bekas',
-                    selected: _condition == 'Bekas',
-                    onTap: () {
-                      setState(() {
-                        _condition = 'Bekas';
-                      });
-                    },
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               // GAMBAR BARANG
               const Text(
-                'Gambar Barang',
+                'Foto Barang (opsional)',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: kTextDark,
@@ -768,7 +699,7 @@ Gambar: ${_imageName ?? '-'}
                   Expanded(
                     child: Text(
                       _imageName ??
-                          'Belum ada gambar. Tap ikon untuk foto / pilih gambar.',
+                          'Belum ada foto. Tap ikon untuk foto / pilih gambar.',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade700,
@@ -780,7 +711,81 @@ Gambar: ${_imageName ?? '-'}
 
               const SizedBox(height: 20),
 
-              // TOMBOL QR + SUBMIT
+              // FIELD TEKS
+              _ModernTextField(
+                label: 'Nama Barang',
+                controller: _nameCtrl,
+                validator: (v) =>
+                    v == null || v.trim().isEmpty ? 'Wajib diisi' : null,
+              ),
+              const SizedBox(height: 10),
+              _ModernTextField(
+                label: 'No. Seri / IMEI',
+                controller: _skuCtrl,
+              ),
+              const SizedBox(height: 10),
+              _ModernTextField(
+                label: 'Merk',
+                controller: _merkCtrl,
+              ),
+              const SizedBox(height: 10),
+              _ModernTextField(
+                label: 'Perkiraan Biaya',
+                controller: _hargaCtrl,
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 10),
+              _ModernTextField(
+                label: 'Jumlah Unit',
+                controller: _totalCtrl,
+                keyboardType: TextInputType.number,
+                validator: (v) =>
+                    v == null || v.trim().isEmpty ? 'Wajib diisi' : null,
+              ),
+              const SizedBox(height: 10),
+              _ModernTextField(
+                label: 'Nama Customer',
+                controller: _customerCtrl,
+              ),
+              const SizedBox(height: 18),
+
+              // STATUS SERVICE
+              const Text(
+                'Status Service',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: kTextDark,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  _StatusChip(
+                    label: 'Dalam Proses',
+                    selected: _status == 'Dalam Proses',
+                    onTap: () {
+                      setState(() {
+                        _status = 'Dalam Proses';
+                      });
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  _StatusChip(
+                    label: 'Selesai',
+                    selected: _status == 'Selesai',
+                    onTap: () {
+                      setState(() {
+                        _status = 'Selesai';
+                      });
+                    },
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              // TOMBOL QR + SIMPAN
               Row(
                 children: [
                   Expanded(
@@ -889,7 +894,7 @@ class _ModernTextField extends StatelessWidget {
             color: kTextDark,
           ),
         ),
-        const SizedBox(height: 5),
+        const SizedBox(height: 6),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
@@ -919,12 +924,12 @@ class _ModernTextField extends StatelessWidget {
   }
 }
 
-class _ConditionChip extends StatelessWidget {
+class _StatusChip extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
 
-  const _ConditionChip({
+  const _StatusChip({
     required this.label,
     required this.selected,
     required this.onTap,
@@ -936,7 +941,7 @@ class _ConditionChip extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: selected ? kPrimary : kCardBg,
           borderRadius: BorderRadius.circular(16),
@@ -947,7 +952,7 @@ class _ConditionChip extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 12,
             fontWeight: FontWeight.w700,
             color: selected ? Colors.white : kPrimary,
           ),
@@ -956,4 +961,3 @@ class _ConditionChip extends StatelessWidget {
     );
   }
 }
-

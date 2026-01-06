@@ -1,8 +1,33 @@
 # **Inventory App**
 
-**Inventory App** adalah aplikasi Flutter yang dirancang untuk memberikan pengalaman pengelolaan stok yang lebih modern, cepat, dan akurat. Aplikasi ini membantu pengguna dalam **mencatat, memantau, dan mengelola persediaan barang** secara terstruktur sehingga proses operasional menjadi lebih efisien.
+**Inventory App** adalah aplikasi Flutter yang dirancang untuk memberikan pengalaman pengelolaan stok yang lebih modern, cepat, dan akurat. Aplikasi ini membantu pengguna dalam **mencatat, memantau, dan mengelola persediaan barang melalui fitur scan barcode** secara terstruktur sehingga proses operasional menjadi lebih efisien untuk konter service hp
 
-Dengan antarmuka yang bersih dan mudah dipahami, aplikasi ini memungkinkan siapa pun—baik individu maupun UMKM—untuk mengontrol data persediaan dengan tepat waktu dan bebas kesalahan.
+---
+
+Kelas C - 202210370311491 - Ellyas Prambudyas - Ellyas-Prambudyas
+Kelas C - 202210370311465 - Januar Muiz Triananda - Januar Muiz
+Kelas C - 202210370311509 - Adam Bahari Wiyono - AdamBahari
+
+---
+
+Link Figma : https://www.figma.com/design/iLJ0kZ6V8vcQtAqlSBoOAv/Inventory-App?node-id=0-1&m=dev&t=znMvXiiw1UaQGlCi-1
+
+---
+
+Worksheet : ada di folder worksheet
+
+---
+
+Low Fidelity Prototype :
+- Low Fidelity 1
+![[Img 1](High Fidelity & Low Fidelity/Low Fidelity 1.png)](https://github.com/Ellyas-Prambudyas/inventoryapp/blob/main/High%20Fidelity%20%26%20Low%20Fidelity/Low%20Fidelity%201.png)
+- Low Fidelity 2
+![[Img 2](High Fidelity & Low Fidelity/Low Fidelity 2.png)](https://github.com/Ellyas-Prambudyas/inventoryapp/blob/main/High%20Fidelity%20%26%20Low%20Fidelity/Low%20Fidelity%202.png)
+- Low Fidelity 3
+![[Img 3](High Fidelity & Low Fidelity/Low Fidelity 3.png)](https://github.com/Ellyas-Prambudyas/inventoryapp/blob/main/High%20Fidelity%20%26%20Low%20Fidelity/Low%20Fidelity%203.png)
+---
+
+Tabel Tugas (Backlog) : ada di folder pembagian tugas
 
 ---
 
@@ -11,13 +36,12 @@ Dengan antarmuka yang bersih dan mudah dipahami, aplikasi ini memungkinkan siapa
 ### **1. Manajemen Barang**
 
 * Menambahkan item baru dengan detail lengkap.
-* Mengubah informasi barang seperti nama, kategori, dan kuantitas.
-* Menghapus item dari daftar persediaan.
+* Mengubah informasi barang seperti nama, merk, harga, total , supplier, gambar barang , download kode QR .dll
 
 ### **2. Pelacakan Stok**
 
 * Menampilkan jumlah stok terbaru secara real-time.
-* Memberikan informasi perubahan stok secara cepat.
+* Memberikan informasi detail produk secara akurat, cukup meng scan barcode.
 
 ### **3. Antarmuka Sederhana dan Responsif**
 
@@ -29,9 +53,8 @@ Dengan antarmuka yang bersih dan mudah dipahami, aplikasi ini memungkinkan siapa
 ## **Teknologi yang Digunakan**
 
 * **Flutter** (Dart)
-* **Provider / GetX** (opsional, sesuai implementasi Anda)
-* **Local Database** seperti SQLite atau Hive (jika digunakan)
-* **Cloud Backend** (opsional)
+* **Local Database** Hive 
+* **Cloud Backend** Supabase
 
 ---
 
@@ -46,6 +69,7 @@ flutter run
 ```
 
 3. Pilih perangkat yang ingin digunakan (Android, iOS, atau Chrome untuk web).
+
 
 ---
 
@@ -71,12 +95,7 @@ flutter build web
 
 Hasil build berada di folder `build/web/` dan bisa di-upload ke hosting.
 
----
-
-## **Kontribusi**
-
-Kontribusi dalam bentuk fitur baru, perbaikan bug, dan peningkatan performa sangat diterima. Lakukan fork dan pull request ke repository.
-
----
+Tampilan awal : 
+ ![WhatsApp Image 2025-11-20 at 17 01 04_29446824](https://github.com/user-attachments/assets/fa686534-80a4-4a6b-b806-238e9410b737)
 
 
