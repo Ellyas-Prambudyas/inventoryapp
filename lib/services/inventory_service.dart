@@ -23,40 +23,39 @@ class InventoryService {
   // ==========================
   // HELPER: MAP ROW → ITEMMODEL
   // ==========================
- ItemModel _mapRowToItem(Map<String, dynamic> map) {
-  // Ambil total sebagai quantity
-  final totalValue = map['total'];
-  int qty;
-  if (totalValue is int) {
-    qty = totalValue;
-  } else if (totalValue is num) {
-    qty = totalValue.toInt();
-  } else {
-    qty = 0;
+  ItemModel _mapRowToItem(Map<String, dynamic> map) {
+    // Ambil kolom "total" sebagai quantity
+    final totalValue = map['total'];
+    int qty;
+    if (totalValue is int) {
+      qty = totalValue;
+    } else if (totalValue is num) {
+      qty = totalValue.toInt();
+    } else {
+      qty = 0;
+    }
+
+    final String category = (map['category'] ?? '').toString();
+    final String condition = (map['condition'] ?? '').toString();
+
+    // Kolom foto di Supabase, sesuaikan dengan nama kolom kamu (image_url)
+    final String? imageUrl =
+        map['image_url'] != null ? map['image_url'].toString() : null;
+
+    // Gabungkan category + condition (kalau ada)
+    final String combinedCategory = [
+      if (category.isNotEmpty) category,
+      if (condition.isNotEmpty) '($condition)',
+    ].join(' ').trim();
+
+    return ItemModel(
+      id: map['id'].toString(),
+      name: (map['name'] ?? '').toString(),
+      category: combinedCategory,
+      quantity: qty,
+      imageUrl: imageUrl, // penting agar gambar bisa tampil di Home
+    );
   }
-
-  final String category = (map['category'] ?? '').toString();
-  final String condition = (map['condition'] ?? '').toString();
-
-  // Kolom foto di Supabase, sesuaikan dengan nama kolom kamu:
-  // misalnya: image_url
-  final String? imageUrl = map['image_url'] as String?;
-
-  // Gabungkan category + condition (kalau ada)
-  final String combinedCategory = [
-    if (category.isNotEmpty) category,
-    if (condition.isNotEmpty) '($condition)',
-  ].join(' ').trim();
-
-  return ItemModel(
-    id: map['id'].toString(),
-    name: (map['name'] ?? '').toString(),
-    category: combinedCategory,
-    quantity: qty,
-    imageUrl: imageUrl, // <-- PENTING
-  );
-}
-
 
   // ==========================
   // AMBIL DATA DARI DATABASE
@@ -79,83 +78,86 @@ class InventoryService {
     }
   }
 
- Future<ItemModel?> getItemByQr(String qrValue) async {
-  try {
-    final text = qrValue.trim();
+  // ==========================
+  // GET BY QR
+  // ==========================
+  Future<ItemModel?> getItemByQr(String qrValue) async {
+    try {
+      final text = qrValue.trim();
 
-    String? sku;
-    String? nameInQr;
+      String? sku;
+      String? nameInQr;
 
-    // --- PARSE QR MULTILINE: ambil SKU & Nama saja ---
-    for (final rawLine in text.split('\n')) {
-      final line = rawLine.trim();
-      final lower = line.toLowerCase();
+      // PARSE QR MULTILINE: ambil SKU & Nama saja
+      for (final rawLine in text.split('\n')) {
+        final line = rawLine.trim();
+        final lower = line.toLowerCase();
 
-      if (lower.startsWith('sku:')) {
-        // "SKU: gh"
-        sku = line.substring(line.indexOf(':') + 1).trim();
-      } else if (lower.startsWith('nama barang:')) {
-        nameInQr = line.substring(line.indexOf(':') + 1).trim();
-      } else if (lower.startsWith('nama:')) {
-        nameInQr = line.substring(line.indexOf(':') + 1).trim();
+        if (lower.startsWith('sku:')) {
+          // "SKU: gh"
+          sku = line.substring(line.indexOf(':') + 1).trim();
+        } else if (lower.startsWith('nama barang:')) {
+          nameInQr = line.substring(line.indexOf(':') + 1).trim();
+        } else if (lower.startsWith('nama:')) {
+          nameInQr = line.substring(line.indexOf(':') + 1).trim();
+        }
       }
-    }
 
-    debugPrint('QR items text: "$text" | parsed sku: "$sku" | name: "$nameInQr"');
+      debugPrint(
+          'QR items text: "$text" | parsed sku: "$sku" | name: "$nameInQr"');
 
-    Map<String, dynamic>? result;
+      Map<String, dynamic>? result;
 
-    // 1) Kalau ada SKU → coba persis di kolom sku
-    if (sku != null && sku!.isNotEmpty) {
-      final res = await _supabase
-          .from('items')
-          .select()
-          .eq('sku', sku)
-          .maybeSingle();
+      // 1) Kalau ada SKU → coba persis di kolom sku
+      if (sku != null && sku.isNotEmpty) {
+        final res = await _supabase
+            .from('items')
+            .select()
+            .eq('sku', sku)
+            .maybeSingle();
 
-      if (res != null) {
-        result = res as Map<String, dynamic>;
+        if (res != null) {
+          result = res as Map<String, dynamic>;
+        }
       }
-    }
 
-    // 2) Kalau belum ketemu, tiru persis searchItems()
-    if (result == null) {
-      // pakai nama dari QR dulu, kalau nggak ada pakai seluruh teks QR
-      final keyword = (nameInQr != null && nameInQr!.isNotEmpty)
-          ? nameInQr!
-          : text;
+      // 2) Kalau belum ketemu, tiru persis searchItems()
+      if (result == null) {
+        // pakai nama dari QR dulu, kalau nggak ada pakai seluruh teks QR
+        final keyword = (nameInQr != null && nameInQr.isNotEmpty)
+            ? nameInQr
+            : text;
 
-      final q = '%$keyword%';
+        final q = '%$keyword%';
 
-      final response = await _supabase
-          .from('items')
-          .select()
-          .or('name.ilike.$q,sku.ilike.$q,merk.ilike.$q,supplier.ilike.$q')
-          .order('created_at', ascending: false)
-          .limit(1);
+        final response = await _supabase
+            .from('items')
+            .select()
+            .or('name.ilike.$q,sku.ilike.$q,merk.ilike.$q,supplier.ilike.$q')
+            .order('created_at', ascending: false)
+            .limit(1);
 
-      if (response is List && response.isNotEmpty) {
-        result = response.first as Map<String, dynamic>;
+        if (response is List && response.isNotEmpty) {
+          result = response.first as Map<String, dynamic>;
+        }
       }
-    }
 
-    if (result == null) {
-      debugPrint('getItemByQr: tetap tidak ada item untuk "$text"');
+      if (result == null) {
+        debugPrint('getItemByQr: tetap tidak ada item untuk "$text"');
+        return null;
+      }
+
+      return _mapRowToItem(result);
+    } catch (e, st) {
+      debugPrint('Error getItemByQr: $e');
+      debugPrint('$st');
       return null;
     }
-
-    return _mapRowToItem(result);
-  } catch (e, st) {
-    debugPrint('Error getItemByQr: $e');
-    debugPrint('$st');
-    return null;
   }
-}
 
-
-
-
-
+  // ==========================
+  // DETAIL RAW 1 ROW
+  // ==========================
   /// Ambil RAW row berdasarkan id (untuk detail lengkap)
   Future<Map<String, dynamic>?> getItemRowById(String id) async {
     try {
@@ -202,7 +204,7 @@ class InventoryService {
   // UPDATE / DELETE DI DATABASE
   // ==========================
 
-  /// Update beberapa kolom (misal dari dialog Edit)
+  /// Update beberapa kolom (misal dari dialog Edit / keluarkan stok)
   Future<bool> updateItemRemote(
     String id, {
     String? name,
@@ -210,14 +212,14 @@ class InventoryService {
   }) async {
     final Map<String, dynamic> update = {};
     if (name != null) update['name'] = name;
-    if (total != null) update['total'] = total;
+    if (total != null) update['total'] = total; // kolom di Supabase
 
     if (update.isEmpty) return true;
 
     try {
       await _supabase.from('items').update(update).eq('id', id);
 
-      // update cache lokal kalau ada
+      // update cache lokal supaya UI langsung berubah
       final current = List<ItemModel>.from(items.value);
       final index = current.indexWhere((e) => e.id == id);
       if (index != -1) {
@@ -227,6 +229,7 @@ class InventoryService {
           name: name ?? old.name,
           category: old.category,
           quantity: total ?? old.quantity,
+          imageUrl: old.imageUrl, // JANGAN HILANGKAN imageUrl
         );
         items.value = current;
       }
