@@ -1,36 +1,46 @@
 # **Inventory App**
 
-**Inventory App** adalah aplikasi Flutter yang dirancang untuk memberikan pengalaman pengelolaan stok yang lebih modern, cepat, dan akurat. Aplikasi ini membantu pengguna dalam **mencatat, memantau, dan mengelola persediaan barang melalui fitur scan barcode** secara terstruktur sehingga proses operasional menjadi lebih efisien untuk konter service hp
+**Inventory App** adalah aplikasi Flutter yang dirancang untuk memberikan pengalaman pengelolaan stok yang lebih modern, cepat, dan akurat. Aplikasi ini membantu pengguna dalam **mencatat, memantau, dan mengelola persediaan barang melalui fitur scan barcode** secara terstruktur sehingga proses operasional menjadi lebih efisien untuk konter service HP.
 
-Video apk : https://vt.tiktok.com/ZS5QbuDFo/
-
----
-
-Kelas C - 202210370311491 - Ellyas Prambudyas - Ellyas-Prambudyas
-Kelas C - 202210370311465 - Januar Muiz Triananda - Januar Muiz
-Kelas C - 202210370311509 - Adam Bahari Wiyono - AdamBahari
+Video APK: [TikTok Video](https://vt.tiktok.com/ZS5QbuDFo/)
 
 ---
 
-Link Figma : https://www.figma.com/design/iLJ0kZ6V8vcQtAqlSBoOAv/Inventory-App?node-id=0-1&m=dev&t=znMvXiiw1UaQGlCi-1
+### **Anggota Tim**
 
-Link Download Firebase : https://appdistribution.firebase.dev/i/0f3f8ddc43ca5638
+- Kelas C - 202210370311491 - Ellyas Prambudyas
+- Kelas C - 202210370311465 - Januar Muiz Triananda
+- Kelas C - 202210370311509 - Adam Bahari Wiyono
+
 ---
 
-Worksheet : ada di folder worksheet
+### **Link Terkait**
+
+- **Link Figma**: [Figma Design](https://www.figma.com/design/iLJ0kZ6V8vcQtAqlSBoOAv/Inventory-App?node-id=0-1&m=dev&t=znMvXiiw1UaQGlCi-1)
+- **Link Download Firebase**: [Firebase App Distribution](https://appdistribution.firebase.dev/i/0f3f8ddc43ca5638)
 
 ---
 
-Low Fidelity Prototype :
-- Low Fidelity 1
-![[Img 1](High Fidelity & Low Fidelity/Low Fidelity 1.png)](https://github.com/Ellyas-Prambudyas/inventoryapp/blob/main/High%20Fidelity%20%26%20Low%20Fidelity/Low%20Fidelity%201.png)
-- Low Fidelity 2
-![[Img 2](High Fidelity & Low Fidelity/Low Fidelity 2.png)](https://github.com/Ellyas-Prambudyas/inventoryapp/blob/main/High%20Fidelity%20%26%20Low%20Fidelity/Low%20Fidelity%202.png)
-- Low Fidelity 3
-![[Img 3](High Fidelity & Low Fidelity/Low Fidelity 3.png)](https://github.com/Ellyas-Prambudyas/inventoryapp/blob/main/High%20Fidelity%20%26%20Low%20Fidelity/Low%20Fidelity%203.png)
+### **Worksheet**  
+Ada di folder `worksheet`.
+
 ---
 
-Tabel Tugas (Backlog) : ada di folder pembagian tugas
+### **Low Fidelity Prototype**
+
+- **Low Fidelity 1**  
+  ![Low Fidelity 1](https://github.com/Ellyas-Prambudyas/inventoryapp/blob/main/High%20Fidelity%20%26%20Low%20Fidelity/Low%20Fidelity%201.png)
+  
+- **Low Fidelity 2**  
+  ![Low Fidelity 2](https://github.com/Ellyas-Prambudyas/inventoryapp/blob/main/High%20Fidelity%20%26%20Low%20Fidelity/Low%20Fidelity%202.png)
+  
+- **Low Fidelity 3**  
+  ![Low Fidelity 3](https://github.com/Ellyas-Prambudyas/inventoryapp/blob/main/High%20Fidelity%20%26%20Low%20Fidelity/Low%20Fidelity%203.png)
+
+---
+
+### **Tabel Tugas (Backlog)**  
+Ada di folder `pembagian tugas`.
 
 ---
 
@@ -39,12 +49,12 @@ Tabel Tugas (Backlog) : ada di folder pembagian tugas
 ### **1. Manajemen Barang**
 
 * Menambahkan item baru dengan detail lengkap.
-* Mengubah informasi barang seperti nama, merk, harga, total , supplier, gambar barang , download kode QR .dll
+* Mengubah informasi barang seperti nama, merk, harga, total, supplier, gambar barang, download kode QR, dan lain-lain.
 
 ### **2. Pelacakan Stok**
 
 * Menampilkan jumlah stok terbaru secara real-time.
-* Memberikan informasi detail produk secara akurat, cukup meng scan barcode.
+* Memberikan informasi detail produk secara akurat, cukup dengan scan barcode.
 
 ### **3. Antarmuka Sederhana dan Responsif**
 
@@ -56,8 +66,8 @@ Tabel Tugas (Backlog) : ada di folder pembagian tugas
 ## **Teknologi yang Digunakan**
 
 * **Flutter** (Dart)
-* **Local Database** Hive 
-* **Cloud Backend** Supabase
+* **Local Database**: Hive
+* **Cloud Backend**: Supabase
 
 ---
 
@@ -66,38 +76,6 @@ Tabel Tugas (Backlog) : ada di folder pembagian tugas
 1. Pastikan Flutter SDK sudah terpasang.
 2. Jalankan perintah berikut:
 
-```
+```bash
 flutter pub get
 flutter run
-```
-
-3. Pilih perangkat yang ingin digunakan (Android, iOS, atau Chrome untuk web).
-
-
----
-
-## **Cara Instalasi & Deploy**
-
-### **Android (APK)**
-
-```
-flutter build apk --release
-```
-
-File APK akan muncul di:
-
-```
-build/app/outputs/flutter-apk/app-release.apk
-```
-
-### **Web**
-
-```
-flutter build web
-```
-
-Hasil build berada di folder `build/web/` dan bisa di-upload ke hosting.
-
-Tampilan halaman Login : 
-![WhatsApp Image 2026-01-06 at 06 13 05 (1)](https://github.com/user-attachments/assets/6f25409c-83d9-470c-a66f-dada44e70332)
-
