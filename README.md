@@ -2,6 +2,8 @@
 
 **Inventory App** adalah aplikasi Flutter yang dirancang untuk memberikan pengalaman pengelolaan stok yang lebih modern, cepat, dan akurat. Aplikasi ini membantu pengguna dalam **mencatat, memantau, dan mengelola persediaan barang melalui fitur scan barcode** secara terstruktur sehingga proses operasional menjadi lebih efisien untuk konter service hp
 
+Video apk : https://vt.tiktok.com/ZS5QbuDFo/
+
 ---
 
 Kelas C - 202210370311491 - Ellyas Prambudyas - Ellyas-Prambudyas
@@ -12,6 +14,7 @@ Kelas C - 202210370311509 - Adam Bahari Wiyono - AdamBahari
 
 Link Figma : https://www.figma.com/design/iLJ0kZ6V8vcQtAqlSBoOAv/Inventory-App?node-id=0-1&m=dev&t=znMvXiiw1UaQGlCi-1
 
+Link Download Firebase : https://appdistribution.firebase.dev/i/0f3f8ddc43ca5638
 ---
 
 Worksheet : ada di folder worksheet
@@ -95,7 +98,6 @@ flutter build web
 
 Hasil build berada di folder `build/web/` dan bisa di-upload ke hosting.
 
-Tampilan awal : 
- ![WhatsApp Image 2025-11-20 at 17 01 04_29446824](https://github.com/user-attachments/assets/fa686534-80a4-4a6b-b806-238e9410b737)
-
+Tampilan halaman Login : 
+![WhatsApp Image 2026-01-06 at 06 13 05 (1)](https://github.com/user-attachments/assets/6f25409c-83d9-470c-a66f-dada44e70332)
 
