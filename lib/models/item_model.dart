@@ -15,4 +15,4 @@ class ItemModel {
     this.imageUrl,
   });
 }
-c
+
