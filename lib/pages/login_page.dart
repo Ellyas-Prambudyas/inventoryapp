@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../routes/app_routes.dart';
+import '../services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,54 +12,115 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  final _usernameCtrl = TextEditingController();
+class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
+  static const Color _orange = Color(0xFFFF7A00);
+  static const Color _bg = Color(0xFFF5F6FA);
+
+  final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
 
-  static const String _validUsername = 'admin';
-  static const String _validPassword = 'admin123';
+  bool _loading = false;
+  bool _obscure = true;
 
-  final String _adminPhone = '6281234567890';
+  final String _adminPhone = '6281230968686';
+
+  late final AnimationController _logoCtrl;
+  late final Animation<double> _pulse;
+  late final Animation<double> _ringFade;
+
+  @override
+  void initState() {
+    super.initState();
+    _logoCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1800))
+      ..repeat(reverse: true);
+
+    _pulse = Tween<double>(begin: 0.985, end: 1.015).animate(
+      CurvedAnimation(parent: _logoCtrl, curve: Curves.easeInOutCubic),
+    );
+
+    _ringFade = Tween<double>(begin: 0.20, end: 0.55).animate(
+      CurvedAnimation(parent: _logoCtrl, curve: Curves.easeInOut),
+    );
+  }
 
   @override
   void dispose() {
-    _usernameCtrl.dispose();
+    _logoCtrl.dispose();
+    _emailCtrl.dispose();
     _passwordCtrl.dispose();
     super.dispose();
   }
 
-  void _onLogin() {
-    final username = _usernameCtrl.text.trim();
+  Future<void> _onLogin() async {
+    final email = _emailCtrl.text.trim();
     final password = _passwordCtrl.text.trim();
 
-    if (username.isEmpty || password.isEmpty) {
-      _showLoginPopup(
-        title: 'LOGIN GAGAL',
-        message: 'Username dan password wajib diisi',
-        success: false,
-      );
+    if (email.isEmpty || password.isEmpty) {
+      _showNotice(NoticeType.error, 'Login gagal', 'Email dan password wajib diisi.');
+      return;
+    }
+    if (!_isValidEmail(email)) {
+      _showNotice(NoticeType.error, 'Login gagal', 'Format email tidak valid. Contoh: nama@email.com');
       return;
     }
 
-    if (username == _validUsername && password == _validPassword) {
-      _showLoginPopup(
-        title: 'LOGIN BERHASIL',
-        message: 'Selamat datang di Inventory App',
-        success: true,
-      );
+    setState(() => _loading = true);
 
-      // pindah ke homepage setelah popup hilang
-      Future.delayed(const Duration(milliseconds: 1500), () {
-        if (!mounted) return;
-        Navigator.pushReplacementNamed(context, AppRoutes.home);
-      });
-    } else {
-      _showLoginPopup(
-        title: 'LOGIN GAGAL',
-        message: 'Username atau password salah',
-        success: false,
+    try {
+      await AuthService.signIn(email: email, password: password);
+
+      // Pastikan session benar-benar terbentuk
+      final session = Supabase.instance.client.auth.currentSession;
+      if (session == null) {
+        _showNotice(
+          NoticeType.error,
+          'Login gagal',
+          'Autentikasi tidak menghasilkan session. Periksa status email confirm di Supabase.',
+        );
+        return;
+      }
+
+      if (!mounted) return;
+
+      _showNotice(NoticeType.success, 'Login berhasil', 'Selamat datang. Mengalihkan ke dashboard…');
+
+      // Navigate stabil: hapus stack agar tidak balik ke login
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.home,
+        (route) => false,
       );
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      _showNotice(NoticeType.error, 'Login gagal', _mapAuthError(e.message));
+    } catch (_) {
+      if (!mounted) return;
+      _showNotice(NoticeType.error, 'Login gagal', 'Terjadi kesalahan sistem. Coba lagi.');
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
+  }
+
+  bool _isValidEmail(String email) {
+    final re = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+    return re.hasMatch(email);
+  }
+
+  String _mapAuthError(String raw) {
+    final lower = raw.toLowerCase();
+
+    if (lower.contains('invalid login credentials')) {
+      return 'Email atau password salah.';
+    }
+    if (lower.contains('email not confirmed')) {
+      return 'Email belum diverifikasi. Jika ingin tanpa email verifikasi, matikan Confirm Email di Supabase.';
+    }
+    if (lower.contains('too many requests') || lower.contains('rate limit')) {
+      return 'Terlalu banyak percobaan. Tunggu sebentar lalu coba lagi.';
+    }
+    if (lower.contains('network') || lower.contains('socket')) {
+      return 'Koneksi bermasalah. Periksa internet Anda lalu coba lagi.';
+    }
+    return raw.isEmpty ? 'Login gagal. Coba lagi.' : raw;
   }
 
   Future<void> _hubungiAdmin() async {
@@ -70,245 +133,308 @@ class _LoginPageState extends State<LoginPage> {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Tidak dapat membuka WhatsApp')),
-      );
+      _showNotice(NoticeType.error, 'Gagal', 'Tidak dapat membuka WhatsApp.');
     }
   }
 
-  void _showLoginPopup({
-    required String title,
-    required String message,
-    required bool success,
-  }) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      barrierColor: Colors.black54,
-      builder: (ctx) {
-        return Center(
-          child: TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0.8, end: 1),
-            duration: const Duration(milliseconds: 220),
-            builder: (context, scale, child) {
-              return Transform.scale(
-                scale: scale,
-                child: child,
-              );
-            },
-            child: Container(
-              width: 260,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+  // Notifikasi modern: SnackBar floating (tidak mengganggu navigasi)
+  void _showNotice(NoticeType type, String title, String message) {
+    final accent = type == NoticeType.success ? const Color(0xFF16A34A) : const Color(0xFFDC2626);
+    final icon = type == NoticeType.success ? Icons.check_circle_rounded : Icons.error_rounded;
+
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+
+    messenger.showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.white,
+        elevation: 12,
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        duration: Duration(seconds: type == NoticeType.success ? 2 : 4),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: accent.withOpacity(0.18)),
+        ),
+        action: type == NoticeType.error
+            ? SnackBarAction(
+                label: 'Tutup',
+                textColor: accent,
+                onPressed: () => messenger.hideCurrentSnackBar(),
+              )
+            : null,
+        content: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 42,
+              height: 42,
               decoration: BoxDecoration(
-                color: success ? const Color(0xFFF28B3A) : Colors.redAccent,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black45,
-                    blurRadius: 14,
-                    offset: Offset(0, 8),
-                  ),
-                ],
+                color: accent.withOpacity(0.10),
+                borderRadius: BorderRadius.circular(12),
               ),
+              child: Icon(icon, color: accent, size: 24),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    success ? Icons.check_circle : Icons.error,
-                    size: 40,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'INVENTORY APP',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Divider(
-                    color: Colors.white70,
-                    thickness: 1,
-                  ),
-                  const SizedBox(height: 8),
                   Text(
                     title,
-                    textAlign: TextAlign.center,
                     style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.1,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 14,
+                      height: 1.1,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Text(
                     message,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
+                    style: TextStyle(
+                      color: Colors.black.withOpacity(0.70),
+                      fontSize: 12.8,
+                      height: 1.25,
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
+  }
 
-    Future.delayed(const Duration(milliseconds: 1400), () {
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context);
-      }
-    });
+  InputDecoration _dec({
+    required String label,
+    required IconData icon,
+    String? hint,
+    Widget? suffixIcon,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      prefixIcon: Icon(icon),
+      suffixIcon: suffixIcon,
+      filled: true,
+      fillColor: Colors.white, // tajam, tidak blur
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.black12),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.black12),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: _orange, width: 1.7),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    const orange = Color(0xFFF28B3A); // warna header, field, tombol
-    const yellow = Color(0xFFFFF3A3); // warna background
-
     return Scaffold(
-      backgroundColor: yellow,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      backgroundColor: _bg,
+      resizeToAvoidBottomInset: true,
+      body: Stack(
         children: [
-          // ===== HEADER ORANYE =====
-          Container(
-            height: 80,
-            color: orange,
-            alignment: Alignment.center,
-            child: const Text(
-              'LOGIN PAGE',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: 18,
-                letterSpacing: 1.2,
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white,
+                    _orange.withOpacity(0.07),
+                    const Color(0xFFEFF2F8),
+                  ],
+                ),
               ),
             ),
           ),
+          Positioned(top: -90, right: -60, child: _GlowBlob(color: _orange.withOpacity(0.18), size: 260)),
+          Positioned(bottom: -110, left: -70, child: _GlowBlob(color: Colors.black.withOpacity(0.06), size: 300)),
 
-          // ===== ISI HALAMAN =====
-          Expanded(
-            child: SingleChildScrollView(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 32, vertical: 32),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // TITLE INVENTORY APP
-                  const Center(
-                    child: Text(
-                      'INVENTORY APP',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-
-                  // LABEL USERNAME
-                  const Text(
-                    'Username',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  _RoundedOrangeTextField(
-                    controller: _usernameCtrl,
-                    hintText: '',
-                    orange: orange,
-                    isPassword: false,
-                  ),
-                  const SizedBox(height: 24),
-
-                  // LABEL PASSWORD
-                  const Text(
-                    'Password',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  _RoundedOrangeTextField(
-                    controller: _passwordCtrl,
-                    hintText: '',
-                    orange: orange,
-                    isPassword: true,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // TEKS "Tidak Bisa Login? Hubungi Admin"
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  18,
+                  18,
+                  18,
+                  18 + MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 520),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text(
-                        'Tidak Bisa Login?  ',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: _hubungiAdmin,
-                        child: const Text(
-                          'Hubungi Admin',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 48),
+                      const SizedBox(height: 6),
 
-                  // BUTTON LOGIN ORANYE
-                  Center(
-                    child: Container(
-                      width: 230,
-                      height: 55,
-                      decoration: BoxDecoration(
-                        color: orange,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black26,
-                            offset: Offset(0, 4),
-                            blurRadius: 6,
+                      _PremiumLogo(
+                        pulse: _pulse,
+                        ringFade: _ringFade,
+                        accent: _orange,
+                        subtitle: 'Login',
+                      ),
+
+                      const SizedBox(height: 18),
+
+                      // Card tajam (tanpa BackdropFilter agar tidak blur)
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.92),
+                          borderRadius: BorderRadius.circular(22),
+                          border: Border.all(color: Colors.white),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x14000000),
+                              blurRadius: 18,
+                              offset: Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const Text(
+                              'Masuk',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Masuk untuk mengelola inventory dan service.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.black.withOpacity(0.58), height: 1.25),
+                            ),
+                            const SizedBox(height: 16),
+
+                            TextField(
+                              controller: _emailCtrl,
+                              keyboardType: TextInputType.emailAddress,
+                              textInputAction: TextInputAction.next,
+                              decoration: _dec(
+                                label: 'Email',
+                                icon: Icons.email_rounded,
+                                hint: 'nama@email.com',
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+
+                            TextField(
+                              controller: _passwordCtrl,
+                              obscureText: _obscure,
+                              textInputAction: TextInputAction.done,
+                              onSubmitted: (_) {
+                                if (!_loading) _onLogin();
+                              },
+                              decoration: _dec(
+                                label: 'Password',
+                                icon: Icons.lock_rounded,
+                                suffixIcon: IconButton(
+                                  onPressed: () => setState(() => _obscure = !_obscure),
+                                  icon: Icon(_obscure ? Icons.visibility_rounded : Icons.visibility_off_rounded),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Tidak bisa login? ',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.black.withOpacity(0.55),
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: _hubungiAdmin,
+                                  child: const Text(
+                                    'Hubungi Admin',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w900,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // Tombol NORMAL (tidak blur)
+                            SizedBox(
+                              height: 54,
+                              child: ElevatedButton(
+                                onPressed: _loading ? null : _onLogin,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _orange,
+                                  disabledBackgroundColor: _orange.withOpacity(0.45),
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  elevation: 6,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    if (_loading) ...[
+                                      const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                    ],
+                                    const Text(
+                                      'Login',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 15,
+                                        letterSpacing: 0.2,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Belum punya akun? ', style: TextStyle(color: Colors.black.withOpacity(0.70))),
+                          TextButton(
+                            onPressed: () => Navigator.pushNamed(context, AppRoutes.register),
+                            child: const Text('Daftar', style: TextStyle(fontWeight: FontWeight.w900)),
                           ),
                         ],
                       ),
-                      child: TextButton(
-                        onPressed: _onLogin,
-                        child: const Text(
-                          'LOGIN',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                      ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -318,45 +444,92 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-/// TextField oranye rounded dengan border biru saat fokus
-class _RoundedOrangeTextField extends StatelessWidget {
-  final TextEditingController controller;
-  final String hintText;
-  final Color orange;
-  final bool isPassword;
+enum NoticeType { success, error }
 
-  const _RoundedOrangeTextField({
-    required this.controller,
-    required this.hintText,
-    required this.orange,
-    required this.isPassword,
+class _PremiumLogo extends StatelessWidget {
+  final Animation<double> pulse;
+  final Animation<double> ringFade;
+  final Color accent;
+  final String subtitle;
+
+  const _PremiumLogo({
+    required this.pulse,
+    required this.ringFade,
+    required this.accent,
+    required this.subtitle,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      obscureText: isPassword,
-      style: const TextStyle(fontSize: 15),
-      decoration: InputDecoration(
-        isDense: true,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-        filled: true,
-        fillColor: orange,
-        hintText: hintText,
-        hintStyle: const TextStyle(color: Colors.white70),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(
-            color: Color(0xFF007BFF), // garis biru saat fokus
-            width: 4,
+    return ScaleTransition(
+      scale: pulse,
+      child: Column(
+        children: [
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              AnimatedBuilder(
+                animation: ringFade,
+                builder: (context, _) {
+                  return Container(
+                    width: 104,
+                    height: 104,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          accent.withOpacity(ringFade.value),
+                          accent.withOpacity(0.04),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+              Container(
+                width: 76,
+                height: 76,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  border: Border.all(color: accent.withOpacity(0.28), width: 1.2),
+                  boxShadow: const [
+                    BoxShadow(color: Color(0x1A000000), blurRadius: 18, offset: Offset(0, 10)),
+                  ],
+                ),
+                child: Icon(Icons.inventory_2_rounded, color: accent, size: 36),
+              ),
+            ],
           ),
-        ),
+          const SizedBox(height: 10),
+          const Text(
+            'Inventory App',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 0.2),
+          ),
+          const SizedBox(height: 4),
+          Text(subtitle, style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w700)),
+        ],
+      ),
+    );
+  }
+}
+
+class _GlowBlob extends StatelessWidget {
+  final Color color;
+  final double size;
+
+  const _GlowBlob({required this.color, required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color,
+        boxShadow: [BoxShadow(color: color, blurRadius: 80, spreadRadius: 20)],
       ),
     );
   }
